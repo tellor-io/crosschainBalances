@@ -1,0 +1,25 @@
+{
+  "name": "crosschainbalances",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/tellor-io/crosschainBalances.git"
+  },
+  "author": "Nick and Brenda",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/tellor-io/crosschainBalances/issues"
+  },
+  "homepage": "https://github.com/tellor-io/crosschainBalances#readme",
+  "devDependencies": {
+    "hardhat": "^2.11.1"
+  },
+  "dependencies": {
+    "usingtellor": "^4.0.7"
+  }
+}
