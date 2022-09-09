@@ -1,4 +1,4 @@
-pragma solidity ^0.5.0;
+pragma solidity ^0.8.3;
 
 library MerkleTree {
     
@@ -59,9 +59,7 @@ contract MerkleTreeUtils {
                     newHash = keccak256(abi.encodePacked(hash1,CurrentTree[index+1]));
                 }             
             }
-            
             CurrentTree[index/2] = newHash;
-            
             index += 2;
             if (index > maxIndex) {
                 maxIndex = (index - 2) / 2;
@@ -73,66 +71,5 @@ contract MerkleTreeUtils {
             }
         }
         return CurrentTree[0];
-    }
-    /*
-    function GetHashList(bytes32[] memory Inputs, uint startIndex) public returns (bytes32[] memory) {
-        uint len = Inputs.length;
-        uint listLen = 0;
-        while (len > 1) {
-            listLen++;
-            len/=2;
-        }
-        len = Inputs.length;
-        listLen += (len % 2);
-        
-        bytes32[] memory CurrentTree = new bytes32[](len/2 + (len) % 2);
-        bytes32[] memory output = new bytes32[](listLen);
-        
-        uint index = 0;
-        uint maxIndex = len - 1;
-        
-        bool readInputs = true;
-        bytes32 newHash;
-        bytes32 hash1;
-        
-        while (true) {
-            
-            if (readInputs) {
-                hash1 = Inputs[index];
-                if (index + 1 > maxIndex){
-                    newHash = keccak256(abi.encodePacked(hash1));
-                }
-                else {
-                    newHash = keccak256(abi.encodePacked(hash1,Inputs[index+1]));
-                }
-                
-            }
-            else {
-                hash1 = CurrentTree[index];
-                if (index + 1 > maxIndex){
-                    newHash = keccak256(abi.encodePacked(hash1));
-                }
-                else {
-                    newHash = keccak256(abi.encodePacked(hash1,CurrentTree[index+1]));
-                }             
-            }
-            
-            CurrentTree[index/2] = newHash;
-            
-            index += 2;
-            if (index > maxIndex) {
-                maxIndex = (index - 2) / 2;
-                if (maxIndex == 0) {
-                    break;
-                }
-                index = 0;
-                readInputs = false;
-            }
-        }
-        return output;
-    }
-    
-    */
-    
-    
+    }  
 }
