@@ -15,34 +15,24 @@ contract CCBalances is UsingTellor{
     mapping(address => address) tokenToMerkleTree;
     mapping(address => bytes32) rootHash;
    
+       
+    
    constructor(address payable _tellor) UsingTellor(_tellor){
+       rootHash = _rootHash;
 
    }
 
-   function newMerkleTree() external{
-       //deploy it and then add address to mapping
+   function newMerkleTree(bytes32 _rootHash, address _token) external{
+       MerkleTree _address = new MerkleTree();
+       rootHash[_address] = _rootHash;
+       tokenToMerkleTree[_token] = _address;
    }
 
    function getCrossChainBalances(uint256 _chain, address _tokenAddress){
        //format query
        //run getDataBefore 12 hours for data
    }
-    
-    /** @dev Contract constructor
-      * @param _rootHash The bytes32 rootHash of the Merkle Tree
-      * @param _cap The token supply cap
-      * @param _name The name of the token 
-      * @param _symbol The symbol of the token
-      * @param _decimals The decimals of the token
-      */
-    constructor(bytes32 _rootHash, uint _cap, string memory _name, string memory _symbol, uint _decimals) 
-        ERC20(_cap, _name, _symbol, _decimals)
-        public 
-    { 
-        rootHash = _rootHash;
-        _balances[msg.sender] = 0;
-    }
-    
+
     function hash(address target, uint balance) public pure returns (bytes32) {
         return keccak256(abi.encode(target,balance));
     }
