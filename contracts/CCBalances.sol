@@ -10,45 +10,35 @@ import "./helpers/MerkleTree.sol";
  @dev Contract for querying balances from another chain
  //shout out to https://github.com/jochem-brouwer/ERC20Snapshot for some of the code!
 */
-contract CCBalances is UsingTellor{
+contract CCBalances is UsingTellor, MerkleTree{
 
-    mapping(address => address) tokenToMerkleTree;
-    mapping(address => bytes32) rootHash;
+   mapping(uint256 => mapping(address => bytes32)) rootHash;
    
-       
-    
-   constructor(address payable _tellor) UsingTellor(_tellor){
-       rootHash = _rootHash;
+   constructor(address payable _tellor) UsingTellor(_tellor){}
 
+   function getCrossChainBalances(uint256 _chain, address _tokenAddress) external returns(bytes32 _newRootHash){
+        bytes memory _b = abi.encode("CrossChainBalance", abi.encode(_chain, _address));
+        bytes32 _queryId = keccak256(_b);
+        bool _didGet;
+        uint256 _timestamp;
+        bytes memory _value;
+        (_didGet, _value, _timestamp) = getDataBefore(_queryId,block.timestamp - 12 hours);
+        _newRoothash = abi.decode(_value,(bytres32));
+        rootHash[_chain][_tokenAddress] = _newRootHash;
    }
 
-   function newMerkleTree(bytes32 _rootHash, address _token) external{
-       MerkleTree _address = new MerkleTree();
-       rootHash[_address] = _rootHash;
-       tokenToMerkleTree[_token] = _address;
-   }
-
-   function getCrossChainBalances(uint256 _chain, address _tokenAddress){
-       //format query
-       //run getDataBefore 12 hours for data
-   }
-
-    function hash(address target, uint balance) public pure returns (bytes32) {
-        return keccak256(abi.encode(target,balance));
-    }
-
-    function verifyBalance(address target, uint balance, bytes32[] calldata hashes, bool[] calldata right) external view returns(bool) {
-        bytes32 myHash = hash(target, balance);
+    function verifyBalance(uint256 _chain, address _token, uint256 balance, bytes32[] calldata hashes, bool[] calldata right) external view returns(bool) {
+        bytes32 _rootHash = rootHash[_chain][_token];
+        bytes32 myHash = keccak256(abi.encode(target,balance);
         if (hashes.length == 1) {
             require(hashes[0] == myHash);
         } else {
             require(hashes[0] == myHash || hashes[1] == myHash);
         }
-        require(MerkleTree.InTree(rootHash, hashes, right));
-        return true;
+        return(MerkleTree.InTree(_rootHash, hashes, right));
     }
     
-    function checkProof(bytes32[] calldata hashes, bool[] calldata hashRight) external view returns (bool) {
-        return MerkleTree.InTree(rootHash, hashes, hashRight);
+    function checkProof(uint _chain, address _token, bytes32[] calldata hashes, bool[] calldata hashRight) external view returns (bool) {
+        return MerkleTree.InTree(rootHash[_chain][_token], hashes, hashRight);
     }
 }
