@@ -1,6 +1,7 @@
+// SPDX-License-Identifier: MIT
 pragma solidity ^0.8.3;
 
-library MerkleTree {
+contract MerkleTree {
     
     /** @dev Function to return true if a TargetHash was part of a tree
       * @param RootHash the root hash of the tree
@@ -19,9 +20,7 @@ library MerkleTree {
         }
         return (CHash == RootHash);
     }
-}
 
-contract MerkleTreeUtils {
     function GetRootHash(bytes32[] memory Inputs) public pure returns (bytes32) {
         uint len = Inputs.length;
         

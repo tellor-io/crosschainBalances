@@ -1,21 +1,8 @@
-pragma solidity ^0.5.0;
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.3;
 
-// ERC20 contract 
-// Functions have all been made external to save some gas.
 
-contract ERC20Interface {
-    function totalSupply() external view returns (uint);
-    function balanceOf(address tokenOwner) external view returns (uint balance);
-    function allowance(address tokenOwner, address spender) external view returns (uint remaining);
-    function transfer(address to, uint tokens) external returns (bool success);
-    function approve(address spender, uint tokens) external returns (bool success);
-    function transferFrom(address from, address to, uint tokens) external returns (bool success);
-
-    event Transfer(address indexed from, address indexed to, uint tokens);
-    event Approval(address indexed tokenOwner, address indexed spender, uint tokens);
-}
-
-contract ERC20 is ERC20Interface { 
+contract ERC20 { 
     
     string public name;
     string public symbol;
@@ -26,6 +13,8 @@ contract ERC20 is ERC20Interface {
     mapping(address => uint) internal _balances;
     mapping(address => mapping(address => uint)) internal _allowance;
     
+    event Transfer(address indexed from, address indexed to, uint tokens);
+    event Approval(address indexed tokenOwner, address indexed spender, uint tokens);
     /** @dev Contract constructor
       * @param _cap The token supply cap
       * @param _name The name of the token 

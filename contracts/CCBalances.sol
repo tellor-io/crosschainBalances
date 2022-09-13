@@ -16,20 +16,20 @@ contract CCBalances is UsingTellor, MerkleTree{
    
    constructor(address payable _tellor) UsingTellor(_tellor){}
 
-   function getCrossChainBalances(uint256 _chain, address _tokenAddress) external returns(bytes32 _newRootHash){
+   function getCrossChainBalances(uint256 _chain, address _address) external returns(bytes32 _newRootHash){
         bytes memory _b = abi.encode("CrossChainBalance", abi.encode(_chain, _address));
         bytes32 _queryId = keccak256(_b);
         bool _didGet;
         uint256 _timestamp;
         bytes memory _value;
         (_didGet, _value, _timestamp) = getDataBefore(_queryId,block.timestamp - 12 hours);
-        _newRoothash = abi.decode(_value,(bytres32));
-        rootHash[_chain][_tokenAddress] = _newRootHash;
+        _newRootHash = abi.decode(_value,(bytes32));
+        rootHash[_chain][_address] = _newRootHash;
    }
 
     function verifyBalance(uint256 _chain, address _token, uint256 balance, bytes32[] calldata hashes, bool[] calldata right) external view returns(bool) {
         bytes32 _rootHash = rootHash[_chain][_token];
-        bytes32 myHash = keccak256(abi.encode(target,balance);
+        bytes32 myHash = keccak256(abi.encode(_token,balance));
         if (hashes.length == 1) {
             require(hashes[0] == myHash);
         } else {
