@@ -27,7 +27,6 @@ contract MerkleTree {
         if (len == 1) {
             return Inputs[0];
         }
-        
         bytes32[] memory CurrentTree = new bytes32[](len/2 + (len) % 2);
         
         uint index = 0;

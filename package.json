@@ -20,6 +20,8 @@
     "hardhat": "^2.11.1"
   },
   "dependencies": {
+    "@nomiclabs/hardhat-waffle": "^2.0.3",
+    "chai": "^4.3.6",
     "usingtellor": "^4.0.7"
   }
 }
