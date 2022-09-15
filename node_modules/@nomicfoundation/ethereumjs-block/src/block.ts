@@ -7,7 +7,6 @@ import {
   arrToBufArr,
   bufArrToArr,
   bufferToHex,
-  isTruthy,
 } from '@nomicfoundation/ethereumjs-util'
 import { keccak256 } from 'ethereum-cryptography/keccak'
 
@@ -110,7 +109,7 @@ export class Block {
 
     // parse transactions
     const transactions = []
-    for (const txData of isTruthy(txsData) ? txsData : []) {
+    for (const txData of txsData ?? []) {
       transactions.push(
         TransactionFactory.fromBlockBodyData(txData, {
           ...opts,
@@ -136,7 +135,7 @@ export class Block {
     if (opts?.hardforkByTTD !== undefined) {
       uncleOpts.hardforkByBlockNumber = true
     }
-    for (const uncleHeaderData of isTruthy(uhsData) ? uhsData : []) {
+    for (const uncleHeaderData of uhsData ?? []) {
       uncleHeaders.push(BlockHeader.fromValuesArray(uncleHeaderData, uncleOpts))
     }
 

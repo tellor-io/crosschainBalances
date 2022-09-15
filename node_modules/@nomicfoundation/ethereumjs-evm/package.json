@@ -1,6 +1,6 @@
 {
   "name": "@nomicfoundation/ethereumjs-evm",
-  "version": "1.0.0-rc.3",
+  "version": "1.0.0",
   "description": "JavaScript Ethereum Virtual Machine (EVM) implementation",
   "keywords": [
     "ethereum",
@@ -33,7 +33,7 @@
     "coverage": "c8 --all --reporter=lcov --reporter=text --reporter=text-lcov npm run coverage:test",
     "coverage:test": "npm run test; cd ../vm; npm run tester -- --state",
     "docs:build": "typedoc --options typedoc.js",
-    "examples": "ts-node ../../scripts/examples-runner.ts -- vm",
+    "examples": "ts-node ../../scripts/examples-runner.ts -- evm",
     "formatTest": "node ./scripts/formatTest",
     "lint": "../../config/cli/lint.sh",
     "lint:diff": "../../config/cli/lint-diff.sh",
@@ -45,8 +45,8 @@
     "tsc": "../../config/cli/ts-compile.sh"
   },
   "dependencies": {
-    "@nomicfoundation/ethereumjs-common": "3.0.0-rc.3",
-    "@nomicfoundation/ethereumjs-util": "8.0.0-rc.3",
+    "@nomicfoundation/ethereumjs-common": "^3.0.0",
+    "@nomicfoundation/ethereumjs-util": "^8.0.0",
     "@types/async-eventemitter": "^0.2.1",
     "async-eventemitter": "^0.2.4",
     "debug": "^4.3.3",
@@ -55,7 +55,7 @@
     "rustbn.js": "~0.2.0"
   },
   "devDependencies": {
-    "@nomicfoundation/ethereumjs-statemanager": "1.0.0-rc.3",
+    "@nomicfoundation/ethereumjs-statemanager": "^1.0.0",
     "@ethersproject/abi": "^5.0.12",
     "@types/benchmark": "^1.0.33",
     "@types/core-js": "^2.5.0",
