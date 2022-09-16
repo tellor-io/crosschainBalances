@@ -15,6 +15,7 @@ describe("Tellor CrosschainBalanceTest", function() {
   let ccBalances;
   let tellorOracle;
   let addr0, addr1, addr2, addr3, addr4
+  let Snap
 
   // Set up Tellor Playground Oracle and SampleUsingTellor
   beforeEach(async function () {
@@ -34,7 +35,7 @@ describe("Tellor CrosschainBalanceTest", function() {
     [addr0, addr1, addr2, addr3, addr4] = await ethers.getSigners();
 
     const initBlock = await hre.ethers.provider.getBlock("latest")
-    let Snap = new Snapshot(tellorOracle.address, initBlock, web3)
+    Snap = new Snapshot(tellorOracle.address, initBlock, web3)
 
 
   });
@@ -57,15 +58,18 @@ describe("Tellor CrosschainBalanceTest", function() {
     await tellorOracle.faucet(addr4.address);
     
     //Take snapshop
-    let blockN = await hre.ethers.provider.getBlock("latest")
+    let blockN = await ethers.provider.getBlockNumber()
+    blockN = blockN*1
+    console.log("block", blockN)
+    console.log(0)
     let root = await Snap.getRootHash(blockN);
-
+console.log(1)
     await Snap.setupData(blockN);
     let hashList = Snap.data[blockN].hashList;
     Snap.setSnapshotContract(ccBalances.address);
-
+    console.log(2)
     let data = Snap.data[blockN]
-
+    console.log(3)
     for (key in data.sortedAccountList) {
       let account = data.sortedAccountList[key];
       let tx = await Snap.getClaimTX(blockN, account);
@@ -78,7 +82,7 @@ describe("Tellor CrosschainBalanceTest", function() {
       console.log("Gas usage: " + rcpt.gasUsed);
       assert.equal(data.balanceMap[account], newBalance, "balances should be equal") 
     }
-
+    console.log(4)
 
     const abiCoder = new ethers.utils.AbiCoder
     const queryDataArgs = abiCoder.encode(['string', 'string'], ['btc', 'usd'])
