@@ -1,6 +1,6 @@
 {
   "name": "@nomicfoundation/ethereumjs-vm",
-  "version": "6.0.0-rc.3",
+  "version": "6.0.0",
   "description": "An Ethereum VM implementation",
   "keywords": [
     "ethereum",
@@ -55,15 +55,15 @@
     "tsc": "../../config/cli/ts-compile.sh"
   },
   "dependencies": {
-    "@nomicfoundation/ethereumjs-block": "4.0.0-rc.3",
-    "@nomicfoundation/ethereumjs-blockchain": "6.0.0-rc.3",
-    "@nomicfoundation/ethereumjs-common": "3.0.0-rc.3",
-    "@nomicfoundation/ethereumjs-evm": "1.0.0-rc.3",
-    "@nomicfoundation/ethereumjs-rlp": "4.0.0-rc.3",
-    "@nomicfoundation/ethereumjs-statemanager": "1.0.0-rc.3",
-    "@nomicfoundation/ethereumjs-trie": "5.0.0-rc.3",
-    "@nomicfoundation/ethereumjs-tx": "4.0.0-rc.3",
-    "@nomicfoundation/ethereumjs-util": "8.0.0-rc.3",
+    "@nomicfoundation/ethereumjs-block": "^4.0.0",
+    "@nomicfoundation/ethereumjs-blockchain": "^6.0.0",
+    "@nomicfoundation/ethereumjs-common": "^3.0.0",
+    "@nomicfoundation/ethereumjs-evm": "^1.0.0",
+    "@nomicfoundation/ethereumjs-rlp": "^4.0.0",
+    "@nomicfoundation/ethereumjs-statemanager": "^1.0.0",
+    "@nomicfoundation/ethereumjs-trie": "^5.0.0",
+    "@nomicfoundation/ethereumjs-tx": "^4.0.0",
+    "@nomicfoundation/ethereumjs-util": "^8.0.0",
     "@types/async-eventemitter": "^0.2.1",
     "async-eventemitter": "^0.2.4",
     "debug": "^4.3.3",

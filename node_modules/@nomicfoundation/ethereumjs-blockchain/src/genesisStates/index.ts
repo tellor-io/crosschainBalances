@@ -1,12 +1,6 @@
 import { RLP } from '@nomicfoundation/ethereumjs-rlp'
 import { Trie } from '@nomicfoundation/ethereumjs-trie'
-import {
-  Account,
-  isHexPrefixed,
-  isTruthy,
-  toBuffer,
-  unpadBuffer,
-} from '@nomicfoundation/ethereumjs-util'
+import { Account, isHexPrefixed, toBuffer, unpadBuffer } from '@nomicfoundation/ethereumjs-util'
 import { keccak256 } from 'ethereum-cryptography/keccak'
 
 import type { PrefixedHexString } from '@nomicfoundation/ethereumjs-util'
@@ -35,13 +29,13 @@ export async function genesisStateRoot(genesisState: GenesisState) {
       account.balance = BigInt(value)
     } else {
       const [balance, code, storage] = value as Partial<AccountState>
-      if (isTruthy(balance)) {
+      if (balance !== undefined) {
         account.balance = BigInt(balance)
       }
-      if (isTruthy(code)) {
+      if (code !== undefined) {
         account.codeHash = Buffer.from(keccak256(toBuffer(code)))
       }
-      if (isTruthy(storage)) {
+      if (storage !== undefined) {
         const storageTrie = new Trie()
         for (const [k, val] of storage) {
           const storageKey = isHexPrefixed(k) ? toBuffer(k) : Buffer.from(k, 'hex')

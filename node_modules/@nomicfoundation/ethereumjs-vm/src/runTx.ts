@@ -1,7 +1,7 @@
 import { Block } from '@nomicfoundation/ethereumjs-block'
 import { ConsensusType, Hardfork } from '@nomicfoundation/ethereumjs-common'
 import { Capability } from '@nomicfoundation/ethereumjs-tx'
-import { Address, KECCAK256_NULL, isFalsy, short, toBuffer } from '@nomicfoundation/ethereumjs-util'
+import { Address, KECCAK256_NULL, short, toBuffer } from '@nomicfoundation/ethereumjs-util'
 import { debug as createDebugLogger } from 'debug'
 
 import { Bloom } from './bloom'
@@ -30,11 +30,6 @@ const debugGas = createDebugLogger('vm:tx:gas')
  * @ignore
  */
 export async function runTx(this: VM, opts: RunTxOpts): Promise<RunTxResult> {
-  // tx is required
-  if (isFalsy(opts.tx)) {
-    throw new Error('invalid input, tx is required')
-  }
-
   // create a reasonable default if no block is given
   opts.block = opts.block ?? Block.fromBlockData({}, { common: opts.tx.common })
 

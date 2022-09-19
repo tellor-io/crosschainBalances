@@ -1,6 +1,6 @@
 import { Chain, Common, Hardfork } from '@nomicfoundation/ethereumjs-common'
 import { ripemdPrecompileAddress } from '@nomicfoundation/ethereumjs-evm/dist/precompiles'
-import { Account, Address, isTruthy, toBuffer } from '@nomicfoundation/ethereumjs-util'
+import { Account, Address, toBuffer } from '@nomicfoundation/ethereumjs-util'
 import { debug as createDebugLogger } from 'debug'
 
 import type { EVMStateAccess } from '@nomicfoundation/ethereumjs-evm/dist/types'
@@ -133,7 +133,7 @@ export class VmState implements EVMStateAccess {
   }
 
   async getAccount(address: Address): Promise<Account> {
-    return await this._stateManager.getAccount(address)
+    return this._stateManager.getAccount(address)
   }
 
   async putAccount(address: Address, account: Account): Promise<void> {
@@ -155,15 +155,15 @@ export class VmState implements EVMStateAccess {
   }
 
   async getContractCode(address: Address): Promise<Buffer> {
-    return await this._stateManager.getContractCode(address)
+    return this._stateManager.getContractCode(address)
   }
 
   async putContractCode(address: Address, value: Buffer): Promise<void> {
-    return await this._stateManager.putContractCode(address, value)
+    return this._stateManager.putContractCode(address, value)
   }
 
   async getContractStorage(address: Address, key: Buffer): Promise<Buffer> {
-    return await this._stateManager.getContractStorage(address, key)
+    return this._stateManager.getContractStorage(address, key)
   }
 
   async putContractStorage(address: Address, key: Buffer, value: Buffer) {
@@ -177,22 +177,22 @@ export class VmState implements EVMStateAccess {
   }
 
   async accountExists(address: Address): Promise<boolean> {
-    return await this._stateManager.accountExists(address)
+    return this._stateManager.accountExists(address)
   }
 
   async setStateRoot(stateRoot: Buffer): Promise<void> {
     if (this._checkpointCount !== 0) {
       throw new Error('Cannot set state root with uncommitted checkpoints')
     }
-    return await this._stateManager.setStateRoot(stateRoot)
+    return this._stateManager.setStateRoot(stateRoot)
   }
 
   async getStateRoot(): Promise<Buffer> {
-    return await this._stateManager.getStateRoot()
+    return this._stateManager.getStateRoot()
   }
 
   async hasStateRoot(root: Buffer): Promise<boolean> {
-    return await this._stateManager.hasStateRoot(root)
+    return this._stateManager.hasStateRoot(root)
   }
 
   /**
@@ -210,12 +210,12 @@ export class VmState implements EVMStateAccess {
    * Merges a storage map into the last item of the accessed storage stack
    */
   private _accessedStorageMerge(
-    storageList: Map<string, Set<string>>[],
+    storageList: Map<string, Set<string> | undefined>[],
     storageMap: Map<string, Set<string>>
   ) {
     const mapTarget = storageList[storageList.length - 1]
 
-    if (isTruthy(mapTarget)) {
+    if (mapTarget !== undefined) {
       // Note: storageMap is always defined here per definition (TypeScript cannot infer this)
       for (const [addressString, slotSet] of storageMap) {
         const addressExists = mapTarget.get(addressString)
@@ -255,10 +255,10 @@ export class VmState implements EVMStateAccess {
         const [balance, code, storage] = state
         const account = Account.fromAccountData({ balance })
         await this.putAccount(addr, account)
-        if (isTruthy(code)) {
+        if (code !== undefined) {
           await this.putContractCode(addr, toBuffer(code))
         }
-        if (isTruthy(storage)) {
+        if (storage !== undefined) {
           for (const [key, value] of storage) {
             await this.putContractStorage(addr, toBuffer(key), toBuffer(value))
           }

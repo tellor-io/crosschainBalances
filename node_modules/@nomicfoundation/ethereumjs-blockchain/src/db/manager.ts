@@ -1,6 +1,6 @@
 import { Block, BlockHeader } from '@nomicfoundation/ethereumjs-block'
 import { RLP } from '@nomicfoundation/ethereumjs-rlp'
-import { arrToBufArr, bufferToBigInt, isFalsy, isTruthy } from '@nomicfoundation/ethereumjs-util'
+import { arrToBufArr, bufferToBigInt } from '@nomicfoundation/ethereumjs-util'
 
 import { Cache } from './cache'
 import { DBOp, DBTarget } from './operation'
@@ -186,8 +186,8 @@ export class DBManager {
     const dbKey = dbGetOperation.baseDBOp.key
     const dbOpts = dbGetOperation.baseDBOp
 
-    if (isTruthy(cacheString)) {
-      if (isFalsy(this._cache[cacheString])) {
+    if (cacheString !== undefined) {
+      if (this._cache[cacheString] === undefined) {
         throw new Error(`Invalid cache: ${cacheString}`)
       }
 

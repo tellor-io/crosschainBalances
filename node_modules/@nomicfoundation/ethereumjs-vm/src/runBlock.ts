@@ -8,7 +8,6 @@ import {
   bigIntToBuffer,
   bufArrToArr,
   intToBuffer,
-  isTruthy,
   short,
 } from '@nomicfoundation/ethereumjs-util'
 import { debug as createDebugLogger } from 'debug'
@@ -53,8 +52,8 @@ export async function runBlock(this: VM, opts: RunBlockOpts): Promise<RunBlockRe
 
   if (
     this._hardforkByBlockNumber ||
-    isTruthy(this._hardforkByTTD) ||
-    isTruthy(opts.hardforkByTTD)
+    this._hardforkByTTD !== undefined ||
+    opts.hardforkByTTD !== undefined
   ) {
     this._common.setHardforkByBlockNumber(
       block.header.number,
@@ -103,7 +102,7 @@ export async function runBlock(this: VM, opts: RunBlockOpts): Promise<RunBlockRe
       debug(
         `Received block results gasUsed=${result.gasUsed} bloom=${short(result.bloom.bitvector)} (${
           result.bloom.bitvector.length
-        } bytes) receiptRoot=${result.receiptRoot.toString('hex')} receipts=${
+        } bytes) receiptsRoot=${result.receiptsRoot.toString('hex')} receipts=${
           result.receipts.length
         } txResults=${result.results.length}`
       )
@@ -130,7 +129,7 @@ export async function runBlock(this: VM, opts: RunBlockOpts): Promise<RunBlockRe
   if (generateFields) {
     const bloom = result.bloom.bitvector
     const gasUsed = result.gasUsed
-    const receiptTrie = result.receiptRoot
+    const receiptTrie = result.receiptsRoot
     const transactionsTrie = await _genTxTrie(block)
     const generatedFields = { stateRoot, bloom, gasUsed, receiptTrie, transactionsTrie }
     const blockData = {
@@ -139,10 +138,10 @@ export async function runBlock(this: VM, opts: RunBlockOpts): Promise<RunBlockRe
     }
     block = Block.fromBlockData(blockData, { common: this._common })
   } else {
-    if (result.receiptRoot.equals(block.header.receiptTrie) === false) {
+    if (result.receiptsRoot.equals(block.header.receiptTrie) === false) {
       if (this.DEBUG) {
         debug(
-          `Invalid receiptTrie received=${result.receiptRoot.toString(
+          `Invalid receiptTrie received=${result.receiptsRoot.toString(
             'hex'
           )} expected=${block.header.receiptTrie.toString('hex')}`
         )
@@ -183,11 +182,11 @@ export async function runBlock(this: VM, opts: RunBlockOpts): Promise<RunBlockRe
 
   const results: RunBlockResult = {
     receipts: result.receipts,
+    logsBloom: result.bloom.bitvector,
     results: result.results,
     stateRoot,
     gasUsed: result.gasUsed,
-    logsBloom: result.bloom.bitvector,
-    receiptRoot: result.receiptRoot,
+    receiptsRoot: result.receiptsRoot,
   }
 
   const afterBlockEvent: AfterBlockEvent = { ...results, block }
@@ -318,7 +317,7 @@ async function applyTransactions(this: VM, block: Block, opts: RunBlockOpts) {
   return {
     bloom,
     gasUsed,
-    receiptRoot: receiptTrie.root(),
+    receiptsRoot: receiptTrie.root(),
     receipts,
     results: txResults,
   }

@@ -20,8 +20,6 @@ import {
   bufferToHex,
   ecrecover,
   ecsign,
-  isFalsy,
-  isTruthy,
   toType,
   zeros,
 } from '@nomicfoundation/ethereumjs-util'
@@ -166,9 +164,9 @@ export class BlockHeader {
 
     const parentHash = toType(headerData.parentHash, TypeOutput.Buffer) ?? defaults.parentHash
     const uncleHash = toType(headerData.uncleHash, TypeOutput.Buffer) ?? defaults.uncleHash
-    const coinbase = isTruthy(headerData.coinbase)
-      ? new Address(toType(headerData.coinbase, TypeOutput.Buffer))
-      : defaults.coinbase
+    const coinbase = new Address(
+      toType(headerData.coinbase ?? defaults.coinbase, TypeOutput.Buffer)
+    )
     const stateRoot = toType(headerData.stateRoot, TypeOutput.Buffer) ?? defaults.stateRoot
     const transactionsTrie =
       toType(headerData.transactionsTrie, TypeOutput.Buffer) ?? defaults.transactionsTrie
@@ -306,9 +304,13 @@ export class BlockHeader {
         throw new Error(msg)
       }
       const londonHfBlock = this._common.hardforkBlock(Hardfork.London)
-      if (isTruthy(londonHfBlock) && this.number === londonHfBlock) {
+      if (
+        typeof londonHfBlock === 'bigint' &&
+        londonHfBlock !== BigInt(0) &&
+        this.number === londonHfBlock
+      ) {
         const initialBaseFee = this._common.param('gasConfig', 'initialBaseFee')
-        if (this.baseFeePerGas! !== initialBaseFee) {
+        if (this.baseFeePerGas !== initialBaseFee) {
           const msg = this._errorMsg('Initial EIP1559 block does not have initial base fee')
           throw new Error(msg)
         }
@@ -410,7 +412,11 @@ export class BlockHeader {
     // EIP-1559: assume double the parent gas limit on fork block
     // to adopt to the new gas target centered logic
     const londonHardforkBlock = this._common.hardforkBlock(Hardfork.London)
-    if (isTruthy(londonHardforkBlock) && this.number === londonHardforkBlock) {
+    if (
+      typeof londonHardforkBlock === 'bigint' &&
+      londonHardforkBlock !== BigInt(0) &&
+      this.number === londonHardforkBlock
+    ) {
       const elasticity = this._common.param('gasConfig', 'elasticityMultiplier')
       parentGasLimit = parentGasLimit * elasticity
     }
@@ -780,7 +786,7 @@ export class BlockHeader {
       return
     }
     const DAOActivationBlock = this._common.hardforkBlock(Hardfork.Dao)
-    if (isFalsy(DAOActivationBlock) || this.number < DAOActivationBlock) {
+    if (DAOActivationBlock === null || this.number < DAOActivationBlock) {
       return
     }
     const DAO_ExtraData = Buffer.from('64616f2d686172642d666f726b', 'hex')

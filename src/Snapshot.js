@@ -1,6 +1,6 @@
 const Web3 = require('web3')
-const ERC20 = require('../artifacts/contracts/helpers/ERC20')
-const ERC20Snapshot = require('../artifacts/contracts/CCBalances')
+const ERC20 = require('../artifacts/contracts/helpers/ERC20.sol/ERC20.json')
+const ERC20Snapshot = require('../artifacts/contracts/CCBalances.sol/CCBalances.json')
 
 const MerkleTree = require("./MerkleTree")
 
