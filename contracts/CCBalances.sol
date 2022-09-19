@@ -12,7 +12,7 @@ import "./helpers/MerkleTree.sol";
 */
 contract CCBalances is UsingTellor, MerkleTree{
 
-   mapping(uint256 => mapping(address => bytes32)) rootHash;
+   mapping(uint256 => mapping(address => bytes32)) public rootHash;
    
    constructor(address payable _tellor) UsingTellor(_tellor){}
 
