@@ -19,16 +19,17 @@ contract CCBalances is UsingTellor, MerkleTree{
 
    function getCrossChainBalances(uint256 _chain, address _address) external returns(bytes32 _newRootHash){
         bytes memory _b = abi.encode("CrossChainBalance", abi.encode(_chain, _address));
-        //console.log("_b %s",_b);
+        //console.logString("_b %s",_b);
         console.log(1);
         bytes32 _queryId = keccak256(_b);
-        console.log(1);
+        console.log(2);
         bool _didGet;
         uint256 _timestamp;
         bytes memory _value;
         (_didGet, _value, _timestamp) = getDataBefore(_queryId,block.timestamp - 12 hours);
-        console.log(2);
+        console.log(3);
         //console.log("didget, value, timestamp",_didGet, _value, _timestamp );
+        console.logBytes(_value);
         _newRootHash = abi.decode(_value,(bytes32));
         //console.log("_newRootHash", _newRootHash);
         rootHash[_chain][_address] = _newRootHash;
