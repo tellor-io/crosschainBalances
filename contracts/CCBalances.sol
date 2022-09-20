@@ -31,8 +31,10 @@ contract CCBalances is UsingTellor, MerkleTree{
         //console.log("didget, value, timestamp",_didGet, _value, _timestamp );
         console.logBytes(_value);
         _newRootHash = abi.decode(_value,(bytes32));
+        console.log(4);
         //console.log("_newRootHash", _newRootHash);
         rootHash[_chain][_address] = _newRootHash;
+        //console.logBytes10(_newRootHash);
    }
 
     function verifyBalance(uint256 _chain, address _token, uint256 balance, bytes32[] calldata hashes, bool[] calldata right) external view returns(bool) {

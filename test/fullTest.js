@@ -59,7 +59,7 @@ describe("Tellor CrosschainBalanceTest", function() {
     let blockN = await ethers.provider.getBlockNumber()
     let root = await Snap.getRootHash(blockN)
 
-    //push snapshot to ccbalances
+  
 
     //create Tellor's queryData
     const abiCoder = new ethers.utils.AbiCoder
@@ -69,9 +69,14 @@ describe("Tellor CrosschainBalanceTest", function() {
 
     // submit value takes 4 args : queryId, value, nonce and queryData
     await tellorOracle.submitValue(queryId,root,0,queryData);
-console.log('broken')
+    //fastward 12 hours 
+    advanceTimeAndBlock(43200)
+    console.log('still broken')
+
+  //get the data to ccbalances by reading a 12 hour tree from tellor
+  //there is no value evan after 12 hour time travel
     let bal = await ccBalances.getCrossChainBalances(1,tellorOracle.address);
-console.log("bal", bal)
+    console.log("bal", bal)
     assert(await ccBalances.rootHash(1,tellorOracle.address) == root, "root should be correct")
 
   });
