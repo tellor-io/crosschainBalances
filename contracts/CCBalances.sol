@@ -28,6 +28,7 @@ contract CCBalances is UsingTellor, MerkleTree{
         //console.logString("_b %s",_b);
         console.log(1);
         bytes32 _queryId = keccak256(_b);
+        console.logBytes32(_queryId);
         console.log(2);
         bool _didGet;
         uint256 _timestamp;
@@ -40,7 +41,7 @@ contract CCBalances is UsingTellor, MerkleTree{
         console.log(4);
         //console.log("_newRootHash", _newRootHash);
         rootHash[_chain][_address] = _newRootHash;
-        //console.logBytes10(_newRootHash);
+        //console.logBytes32(_newRootHash);
    }
 
     function verifyBalance(uint256 _chain, address _token, uint256 balance, bytes32[] calldata hashes, bool[] calldata right) external view returns(bool) {

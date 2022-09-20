@@ -68,6 +68,7 @@ describe("Tellor CrosschainBalanceTest", function() {
     const queryDataArgs = abiCoder.encode(['uint256', 'address'], [1,tellorOracle.address])
     const queryData = abiCoder.encode(['string', 'bytes'], ['CrosschainBalance', queryDataArgs])
     const queryId = ethers.utils.keccak256(queryData)
+    console.log("queryId", queryId)
 
     // submit value takes 4 args : queryId, value, nonce and queryData
     await tellorOracle.submitValue(queryId,root,0,queryData);

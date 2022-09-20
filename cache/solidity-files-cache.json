@@ -2,8 +2,8 @@
   "_format": "hh-sol-cache-2",
   "files": {
     "/Users/brendaloya/Documents/Tellor/1Tellor/tellor/projects/hack/crosschainBalances/contracts/CCBalances.sol": {
-      "lastModificationDate": 1663694310459,
-      "contentHash": "93276afc7b89c3f1d56bdcd3c15944af",
+      "lastModificationDate": 1663695778157,
+      "contentHash": "6caa969161998882f2743c7f5128db1a",
       "sourceName": "contracts/CCBalances.sol",
       "solcConfig": {
         "version": "0.8.9",
