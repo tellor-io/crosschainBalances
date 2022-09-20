@@ -17,6 +17,12 @@ contract CCBalances is UsingTellor, MerkleTree{
    
    constructor(address payable _tellor) UsingTellor(_tellor){}
 
+   /** Gets the balances for the specified chain and token address. The chain id and 
+    * token address are the encoded parameters that create the queryId in tellor. 
+    * @param _chain chain id
+    * @param _address is the token address containing the balances 
+    */
+
    function getCrossChainBalances(uint256 _chain, address _address) external returns(bytes32 _newRootHash){
         bytes memory _b = abi.encode("CrossChainBalance", abi.encode(_chain, _address));
         //console.logString("_b %s",_b);

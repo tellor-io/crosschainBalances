@@ -59,6 +59,8 @@ describe("Tellor CrosschainBalanceTest", function() {
     let blockN = await ethers.provider.getBlockNumber()
     let root = await Snap.getRootHash(blockN)
 
+    console.log("root", root)
+
   
 
     //create Tellor's queryData
@@ -69,8 +71,8 @@ describe("Tellor CrosschainBalanceTest", function() {
 
     // submit value takes 4 args : queryId, value, nonce and queryData
     await tellorOracle.submitValue(queryId,root,0,queryData);
-    //fastward 12 hours 
-    advanceTimeAndBlock(43200)
+    //fastward 12 hours (43200)
+    advanceTimeAndBlock(45000)
     console.log('still broken')
 
   //get the data to ccbalances by reading a 12 hour tree from tellor
