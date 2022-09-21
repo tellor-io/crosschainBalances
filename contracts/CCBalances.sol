@@ -40,10 +40,12 @@ contract CCBalances is UsingTellor, MerkleTree{
      * @param _hashes The array of the hash items. The first is hashed with the second, the second with the third, etc.
      * @return A boolean wether `TargetHash` is part of the Merkle Tree with root hash `RootHash`. True if it is part of this tree, false if not. 
      */
-    function verifyBalance(uint256 _chain, address _token, uint256 _balance, bytes32[] calldata _hashes, bool[] calldata _right) external view returns(bool) {
+    function verifyBalance(uint256 _chain, address _token, address _account, uint256 _balance, bytes32[] calldata _hashes, bool[] calldata _right) external view returns(bool) {
         bytes32 _rootHash = rootHash[_chain][_token];
         console.log(1);
-        bytes32 _myHash = keccak256(abi.encode(_token,_balance));
+        //I think this should be the msg.sender or the account to check the balance for not the token address???
+        bytes32 _myHash = keccak256(abi.encode(_account,_balance));
+        console.logBytes32(_myHash);
         console.log(2);
         if (_hashes.length == 1) {
             require(_hashes[0] == _myHash);

@@ -115,9 +115,15 @@ describe("Tellor CrosschainBalanceTest", function() {
       let balance = web3.utils.fromWei(data.balanceMap[account]);
       console.log('tx',tx)
       console.log('balance', balance)
+      console.log('account',account)
+      //let myhash = MerkleTree.getHash(account, balance)
+      let hasdata = abiCoder.encode(['address', 'uint256'], [account, balance])
+      let myhash = ethers.utils.keccak256(hasdata)
+      //let myhash = web3.utils.soliditySha3(web3.eth.abi.encodeParameters(['address', 'uint'], [account, balance]))
+      console.log('myhash',myhash)
       //verifyBalance(uint256 _chain, address _token, uint256 _balance, bytes32[] calldata _hashes, bool[] calldata _right)
-      let found = await ccBalances.verifyBalance(1,tellorOracle.address,web3.utils.toWei(balance), tx.hashes, tx.hashRight)
-      console.log("key,found", key,found)
+      let found = await ccBalances.verifyBalance(1,tellorOracle.address,account, web3.utils.toWei(balance), tx.hashes, tx.hashRight)
+      //console.log("key,found", key,found)
       //let bool =  Snap.checkProof(chain,token,tx.hashes, tx.hashRight).call();
       //let alldata = Snap.claim(account, balance, tx.hashes, tx.hashRight);
     }
