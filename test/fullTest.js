@@ -14,7 +14,7 @@ const Snapshot = require("../src/Snapshot")
 describe("Tellor CrosschainBalanceTest", function() {
   let ccBalances;
   let tellorOracle;
-  let addr0, addr1, addr2, addr3, addr4
+  let accounts
   let Snap
 
   // Set up Tellor Playground Oracle and SampleUsingTellor
@@ -30,10 +30,7 @@ describe("Tellor CrosschainBalanceTest", function() {
     let CCBalances = await ethers.getContractFactory("CCBalances");
     ccBalances = await CCBalances.deploy(tellorOracle.address);
     await ccBalances.deployed();
-
-
-    [addr0, addr1, addr2, addr3, addr4] = await ethers.getSigners();
-
+    accounts = await ethers.getSigners();
     const initBlock = await hre.ethers.provider.getBlock("latest")
     Snap = new Snapshot(tellorOracle.address, initBlock, web3)
 
@@ -44,82 +41,91 @@ describe("Tellor CrosschainBalanceTest", function() {
   });
   it("test getCrossChainBalances()", async function() {
     //give addresses a balance
-    await tellorOracle.faucet(addr1.address);
-    await tellorOracle.faucet(addr2.address);
-    await tellorOracle.faucet(addr2.address);
-    await tellorOracle.faucet(addr3.address);
-    await tellorOracle.faucet(addr3.address);
-    await tellorOracle.faucet(addr3.address);
-    await tellorOracle.faucet(addr4.address);
-    await tellorOracle.faucet(addr4.address);
-    await tellorOracle.faucet(addr4.address);
-    await tellorOracle.faucet(addr4.address);
-    
+    await tellorOracle.faucet(accounts[1].address);
+    await tellorOracle.faucet(accounts[2].address);
+    await tellorOracle.faucet(accounts[2].address);
+    await tellorOracle.faucet(accounts[3].address);
+    await tellorOracle.faucet(accounts[3].address);
+    await tellorOracle.faucet(accounts[3].address);
+    await tellorOracle.faucet(accounts[4].address);
+    await tellorOracle.faucet(accounts[4].address);
+    await tellorOracle.faucet(accounts[4].address);
+    await tellorOracle.faucet(accounts[4].address);
     //Take snapshop
     let blockN = await ethers.provider.getBlockNumber()
     let root = await Snap.getRootHash(blockN)
-
-    console.log("root", root)
-
-  
-
     //create Tellor's queryData
     const abiCoder = new ethers.utils.AbiCoder
-    const queryDataArgs = abiCoder.encode(['uint256', 'address'], [1,tellorOracle.address])
-    const queryData = abiCoder.encode(['string', 'bytes'], ['CrosschainBalance', queryDataArgs])
-    const queryData2 = abiCoder.encode(['string', 'bytes'], ['CrosschainBalance', abiCoder.encode(['uint256', 'address'], [1,tellorOracle.address])])
+    const queryData = abiCoder.encode(['string', 'bytes'], ['CrossChainBalance', abiCoder.encode(['uint256', 'address'], [1,tellorOracle.address])])
     const queryId = ethers.utils.keccak256(queryData)
-    const queryId2 = ethers.utils.keccak256(queryData2)
-    console.log("queryId", queryId)
-    console.log("queryId2", queryId2)
-    console.log("queryData", queryData)
-    console.log("queryData2", queryData2)
-    const hash = web3.utils.sha3(queryData, {encoding: 'hex'})
-console.log(hash)
-
     // submit value takes 4 args : queryId, value, nonce and queryData
     await tellorOracle.submitValue(queryId,root,0,queryData);
     //fastward 12 hours (43200)
     advanceTimeAndBlock(45000)
-    console.log('still broken')
-
-  //get the data to ccbalances by reading a 12 hour tree from tellor
-  //there is no value evan after 12 hour time travel
     let bal = await ccBalances.getCrossChainBalances(1,tellorOracle.address);
-    console.log("bal", bal)
     assert(await ccBalances.rootHash(1,tellorOracle.address) == root, "root should be correct")
 
   });
-  // it("test verifyBalance()", async function() {
-  //   let blockN = await ethers.provider.getBlockNumber()
-  //   await Snap.setupData(blockN);
-  //   let hashList = Snap.data[blockN].hashList;
-  //   Snap.setSnapshotContract(ccBalances.address);
-  //   console.log(2)
-  //   let data = Snap.data[blockN]
-  //   console.log(3)
-  //   for (key in data.sortedAccountList) {
-  //     let account = data.sortedAccountList[key];
-  //     let proof = await Snap.getClaimTX(blockN, account);
-      
-  //   }
-  //   assert(0==1)
-  // });
+  it("test verifyBalance()", async function() {
+        //give addresses a balance
+        await tellorOracle.faucet(accounts[1].address);
+        await tellorOracle.faucet(accounts[2].address);
+        await tellorOracle.faucet(accounts[2].address);
+        await tellorOracle.faucet(accounts[3].address);
+        await tellorOracle.faucet(accounts[4].address);
+        await tellorOracle.faucet(accounts[4].address);
+        //Take snapshop
+        let blockN = await ethers.provider.getBlockNumber()
+        let root = await Snap.getRootHash(blockN)
+        //create Tellor's queryData
+        const abiCoder = new ethers.utils.AbiCoder
+        const queryData = abiCoder.encode(['string', 'bytes'], ['CrossChainBalance', abiCoder.encode(['uint256', 'address'], [1,tellorOracle.address])])
+        const queryId = ethers.utils.keccak256(queryData)
+        // submit value takes 4 args : queryId, value, nonce and queryData
+        await tellorOracle.submitValue(queryId,root,0,queryData);
+        //fastward 12 hours (43200)
+        advanceTimeAndBlock(45000)
+        let bal = await ccBalances.getCrossChainBalances(1,tellorOracle.address);
+        assert(await ccBalances.rootHash(1,tellorOracle.address) == root, "root should be correct")
+    blockN = await ethers.provider.getBlockNumber()
+    await Snap.setupData(blockN);
+    let hashList = Snap.data[blockN].hashList;
+    Snap.setSnapshotContract(ccBalances.address);
+    let data = Snap.data[blockN]
+    let proof = await Snap.getClaimTX(blockN, accounts[3].address);
+    assert(await tellorOracle.balanceOf(accounts[3].address == 1000), "account balance should be correct")
+    assert(await ccBalances.verifyBalance(1,tellorOracle.address,web3.utils.toWei(1000),proof.hashes, proof.right),"should verify")
+  });
   //checkProof(uint _chain, address _token, bytes32[] calldata hashes, bool[] calldata hashRight)
-  // it("test checkProof()", async function() {
-  //   let blockN = await ethers.provider.getBlockNumber()
-  //   await Snap.setupData(blockN);
-  //   let hashList = Snap.data[blockN].hashList;
-  //   Snap.setSnapshotContract(ccBalances.address);
-  //   console.log(2)
-  //   let data = Snap.data[blockN]
-  //   console.log(3)
-  //   for (key in data.sortedAccountList) {
-  //     let account = data.sortedAccountList[key];
-  //     let proof = await Snap.getClaimTX(blockN, account);
-      
-  //   }
-  //   assert(0==1)
-  // });
+  it("test checkProof()", async function() {
+        //give addresses a balance
+        await tellorOracle.faucet(accounts[1].address);
+        await tellorOracle.faucet(accounts[2].address);
+        await tellorOracle.faucet(accounts[2].address);
+        await tellorOracle.faucet(accounts[3].address);
+        await tellorOracle.faucet(accounts[4].address);
+        await tellorOracle.faucet(accounts[4].address);
+        //Take snapshop
+        let blockN = await ethers.provider.getBlockNumber()
+        let root = await Snap.getRootHash(blockN)
+        //create Tellor's queryData
+        const abiCoder = new ethers.utils.AbiCoder
+        const queryData = abiCoder.encode(['string', 'bytes'], ['CrossChainBalance', abiCoder.encode(['uint256', 'address'], [1,tellorOracle.address])])
+        const queryId = ethers.utils.keccak256(queryData)
+        // submit value takes 4 args : queryId, value, nonce and queryData
+        await tellorOracle.submitValue(queryId,root,0,queryData);
+        //fastward 12 hours (43200)
+        advanceTimeAndBlock(45000)
+        let bal = await ccBalances.getCrossChainBalances(1,tellorOracle.address);
+        assert(await ccBalances.rootHash(1,tellorOracle.address) == root, "root should be correct")
+    blockN = await ethers.provider.getBlockNumber()
+    await Snap.setupData(blockN);
+    let hashList = Snap.data[blockN].hashList;
+    Snap.setSnapshotContract(ccBalances.address);
+    let data = Snap.data[blockN]
+    let proof = await Snap.getClaimTX(blockN, accounts[4].address);
+    assert(await tellorOracle.balanceOf(accounts[4].address == web3.utils.toWei("2000")), "account balance should be correct")
+    assert(await ccBalances.checkProof(1,tellorOracle.address,proof.hashes, proof.right),"should checkProof")
+  });
 
 });

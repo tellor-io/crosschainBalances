@@ -112,7 +112,7 @@ class Snapshot {
     }
   }
 
-  async getClaimTX(chain,token,blockNumber, account) {
+  async getClaimTX(blockNumber, account) {
     await this.setupData(blockNumber);
     let index;
     let data = this.data[blockNumber];
