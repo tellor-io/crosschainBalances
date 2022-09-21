@@ -63,6 +63,6 @@ contract CCBalances is UsingTellor, MerkleTree{
      * @return A boolean wether `TargetHash` is part of the Merkle Tree with root hash `RootHash`. True if it is part of this tree, false if not. 
      */
     function checkProof(uint _chain, address _token, bytes32[] calldata _hashes, bool[] calldata _hashRight) external view returns (bool) {
-        return MerkleTree.InTree(rootHash[_chain][_token], _hashes, _hashRight);
+        return InTree(rootHash[_chain][_token], _hashes, _hashRight);
     }
 }

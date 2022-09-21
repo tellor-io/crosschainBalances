@@ -109,40 +109,42 @@ describe("Tellor CrosschainBalanceTest", function() {
   });
 
   //checkProof(uint _chain, address _token, bytes32[] calldata hashes, bool[] calldata hashRight)
-  // it("test checkProof()", async function() {
-  //   //give addresses a balance
-  //   await tellorOracle.faucet(accounts[1].address)
-  //   await tellorOracle.faucet(accounts[2].address)
-  //   await tellorOracle.faucet(accounts[2].address)
-  //   await tellorOracle.faucet(accounts[3].address)
-  //   await tellorOracle.faucet(accounts[3].address)
-  //   await tellorOracle.faucet(accounts[3].address)
-  //   await tellorOracle.faucet(accounts[4].address)
-  //   await tellorOracle.faucet(accounts[4].address)
-  //   await tellorOracle.faucet(accounts[4].address)
-  //   await tellorOracle.faucet(accounts[4].address)
+  it("test checkProof()", async function() {
+    //give addresses a balance
+    await tellorOracle.faucet(accounts[1].address)
+    await tellorOracle.faucet(accounts[2].address)
+    await tellorOracle.faucet(accounts[2].address)
+    await tellorOracle.faucet(accounts[3].address)
+    await tellorOracle.faucet(accounts[3].address)
+    await tellorOracle.faucet(accounts[3].address)
+    await tellorOracle.faucet(accounts[4].address)
+    await tellorOracle.faucet(accounts[4].address)
+    await tellorOracle.faucet(accounts[4].address)
+    await tellorOracle.faucet(accounts[4].address)
+    //Take snapshop
+    let blockN = await ethers.provider.getBlockNumber()
+    let root = await Snap.getRootHash(blockN)
+    //create Tellor's queryData
+    const abiCoder = new ethers.utils.AbiCoder
+    const queryData = abiCoder.encode(['string', 'bytes'], ['CrossChainBalance', abiCoder.encode(['uint256', 'address'], [1,tellorOracle.address])])
+    const queryId = ethers.utils.keccak256(queryData)
+    // submit value takes 4 args : queryId, value, nonce and queryData
+    await tellorOracle.submitValue(queryId,root,0,queryData)
+    //fastward 12 hours (43200)
+    advanceTimeAndBlock(45000)
+    let bal = await ccBalances.getCrossChainBalances(1,tellorOracle.address)
+    assert(await ccBalances.rootHash(1,tellorOracle.address) == root, "root should be correct")
 
-  //   //Take snapshop
-  //   let blockN = await ethers.provider.getBlockNumber()
-  //   let root = await Snap.getRootHash(blockN)
-  //   //create Tellor's queryData
-  //   const abiCoder = new ethers.utils.AbiCoder
-  //   const queryData = abiCoder.encode(['string', 'bytes'], ['CrossChainBalance', abiCoder.encode(['uint256', 'address'], [1,tellorOracle.address])])
-  //   const queryId = ethers.utils.keccak256(queryData)
-  //   // submit value takes 4 args : queryId, value, nonce and queryData
-  //   await tellorOracle.submitValue(queryId,root,0,queryData)
-  //   //fastward 12 hours (43200)
-  //   advanceTimeAndBlock(45000)
-  //   let bal = await ccBalances.getCrossChainBalances(1,tellorOracle.address)
-  //   assert(await ccBalances.rootHash(1,tellorOracle.address) == root, "root should be correct")
-  //   blockN = await ethers.provider.getBlockNumber()
-  //   await Snap.setupData(blockN)
-  //   let hashList = Snap.data[blockN].hashList
-  //   Snap.setSnapshotContract(ccBalances.address)
-  //   let data = Snap.data[blockN]
-  //   let proof = await Snap.getClaimTX(blockN, accounts[4].address)
-  //   assert(await tellorOracle.balanceOf(accounts[4].address == web3.utils.toWei("2000")), "account balance should be correct")
-  //   assert(await ccBalances.checkProof(1,tellorOracle.address,proof.hashes, proof.right),"should checkProof")
-  // });
+    Snap.setSnapshotContract(ccBalances.address)
+    let data = Snap.data[blockN]
+    let sdata = data.sortedAccountList
+    for (key in data.sortedAccountList) {
+      let account = data.sortedAccountList[key];
+      let tx = await Snap.getClaimTX(blockN, account);
+      let balance = web3.utils.fromWei(data.balanceMap[account]);
+      let found = await ccBalances.checkProof(1,tellorOracle.address, tx.hashes, tx.hashRight)
+      assert(found == true, "account found in tree")
+    }
+  });
 
 });
