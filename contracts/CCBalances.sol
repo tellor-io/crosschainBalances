@@ -42,21 +42,16 @@ contract CCBalances is UsingTellor, MerkleTree{
      */
     function verifyBalance(uint256 _chain, address _token, address _account, uint256 _balance, bytes32[] calldata _hashes, bool[] calldata _right) external view returns(bool) {
         bytes32 _rootHash = rootHash[_chain][_token];
-        console.log(1);
-        //I think this should be the msg.sender or the account to check the balance for not the token address???
         bytes32 _myHash = keccak256(abi.encode(_account,_balance));
-        console.logBytes32(_myHash);
-        console.log(2);
         if (_hashes.length == 1) {
             require(_hashes[0] == _myHash);
-            console.log(3);
+
         } else {
             require(_hashes[0] == _myHash || _hashes[1] == _myHash);
-            console.log(4);
+
         }
-        console.log(5);
-        return(MerkleTree.InTree(_rootHash, _hashes, _right));
-        console.log(6);
+        bool _found =  InTree(_rootHash, _hashes, _right);
+        return _found;
     }
     
     /** Checks the proof provided...

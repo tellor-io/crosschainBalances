@@ -94,45 +94,18 @@ describe("Tellor CrosschainBalanceTest", function() {
     let bal = await ccBalances.getCrossChainBalances(1,tellorOracle.address)
     assert(await ccBalances.rootHash(1,tellorOracle.address) == root, "root should be correct")
 
-    //should we use the block number when this is pushed to tellor or the one where the snapshot
-    //was originally taken? 
-    //blockN = await ethers.provider.getBlockNumber()
-    //await Snap.setupData(blockN)
-    console.log(1)
     Snap.setSnapshotContract(ccBalances.address)
-    
-    console.log(2)
-
-    console.log(3)
     let data = Snap.data[blockN]
-
-    console.log(4)
     let sdata = data.sortedAccountList
-    console.log("sdata" , sdata)
     for (key in data.sortedAccountList) {
       let account = data.sortedAccountList[key];
       let tx = await Snap.getClaimTX(blockN, account);
       let balance = web3.utils.fromWei(data.balanceMap[account]);
-      console.log('tx',tx)
-      console.log('balance', balance)
-      console.log('account',account)
-      //let myhash = MerkleTree.getHash(account, balance)
-      let hasdata = abiCoder.encode(['address', 'uint256'], [account, balance])
-      let myhash = ethers.utils.keccak256(hasdata)
-      //let myhash = web3.utils.soliditySha3(web3.eth.abi.encodeParameters(['address', 'uint'], [account, balance]))
-      console.log('myhash',myhash)
-      //verifyBalance(uint256 _chain, address _token, uint256 _balance, bytes32[] calldata _hashes, bool[] calldata _right)
       let found = await ccBalances.verifyBalance(1,tellorOracle.address,account, web3.utils.toWei(balance), tx.hashes, tx.hashRight)
-      //console.log("key,found", key,found)
-      //let bool =  Snap.checkProof(chain,token,tx.hashes, tx.hashRight).call();
-      //let alldata = Snap.claim(account, balance, tx.hashes, tx.hashRight);
+      assert(found == true, "account found with correct balance in tree")
+      assert( await tellorOracle.balanceOf(account) == data.balanceMap[account], "account balance should be correct")
     }
-
-    //let proof = await Snap.getClaimTX(blockN, accounts[3].address)
-    console.log(5)
-    
-    assert( web3.utils.fromWei(await tellorOracle.balanceOf(accounts[3].address)) == 3000, "account balance should be correct")
-    //assert(await ccBalances.verifyBalance(1,tellorOracle.address,web3.utils.toWei(1000),proof.hashes, proof.right),"should verify")
+       
   });
 
   //checkProof(uint _chain, address _token, bytes32[] calldata hashes, bool[] calldata hashRight)
