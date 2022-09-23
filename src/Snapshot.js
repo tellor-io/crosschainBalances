@@ -25,7 +25,7 @@ class Snapshot {
 
   async getAccountList(blockNumber) {
     let accountMap = {};
-    console.log(this.blockNumber.number)
+    //console.log(this.blockNumber.number)
 
     await this.contract.getPastEvents("Transfer", {
       fromBlock: this.blockNumber.number,
@@ -125,15 +125,9 @@ class Snapshot {
     }
 
     let hashList = this.data[blockNumber].hashList;
-   // console.log(account)
-    let proof = (this.MerkleTree.createProof(hashList, hashList[index]))
-    //let balance = data.balanceMap[account];
-    //return [balance, proof];
-    return proof;
-   //  let bool = await this.snapshot.methods.checkProof(chain,token,proof.hashes, proof.hashRight).call();
-  // //  console.log(bool);
 
-   //return this.snapshot.methods.claim(account, balance, proof.hashes, proof.hashRight);
+    let proof = (this.MerkleTree.createProof(hashList, hashList[index]))
+    return proof;
 
   }
 

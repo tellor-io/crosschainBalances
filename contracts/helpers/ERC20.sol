@@ -15,19 +15,18 @@ contract ERC20 {
     
     event Transfer(address indexed from, address indexed to, uint tokens);
     event Approval(address indexed tokenOwner, address indexed spender, uint tokens);
+
     /** @dev Contract constructor
       * @param _cap The token supply cap
       * @param _name The name of the token 
       * @param _symbol The symbol of the token
-      * @param _decimals The decimals of the token
       */
-
-    constructor(uint _cap, string memory _name, string memory _symbol, uint _decimals) public {
+    constructor(uint _cap, string memory _name, string memory _symbol)  {
         _balances[msg.sender] = _cap;
         _totalSupply = _cap;
         name = _name;
         symbol = _symbol;
-        decimals = _decimals;
+        decimals = 18;
         emit Transfer(address(0x0), msg.sender, _cap);
     }
 
@@ -43,7 +42,7 @@ contract ERC20 {
         return _allowance[tokenOwner][spender];
     }
     
-    function transfer(address to, uint tokens) external returns (bool success) {
+    function transfer(address to, uint tokens) public returns (bool success) {
         require(_balances[msg.sender] >= tokens);
         _balances[msg.sender] -= tokens;
         _balances[to] += tokens;

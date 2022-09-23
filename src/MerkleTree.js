@@ -78,7 +78,6 @@ class MerkleTree {
       }
     }
 
-//    console.log(List, "output", output)
 
     return output;
   }
