@@ -49,7 +49,7 @@ Step 5: Happy building!
 ## Use cases
 - Allow an airdrop based on the users' balances on a different chain
 - Allow a weighted voting based on the users' balances on a different chain
-- Allow a user to claim rewards on a different chain
+- Allow a suser to claim rewards on a different chain
 
 
 
