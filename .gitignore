@@ -5,3 +5,7 @@ cache
 package-lock.json
 ./artifacts
 ./cache
+
+# Config values
+.secret.json
+.env
