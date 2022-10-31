@@ -24,11 +24,14 @@ class Snapshot {
   }
 
   async getAccountList(blockNumber) {
-    let accountMap = {};
-    //console.log(this.blockNumber.number)
+    // let accountMap = {};
+    // let provider = new ethers.providers.JsonRpcProvider("https://eth-mainnet.alchemyapi.io/v2/MZuPL5XON8haLxn4FW5f8iDABp9S_yT3");
+    // let connie = new ethers.Contract(this.target ,ERC20Snapshot.abi ,provider)
+    // const filter = connie.filters.Transfer() 
+    // const events = await connie.queryFilter(filter)
 
     await this.contract.getPastEvents("Transfer", {
-      fromBlock: this.blockNumber.number,
+      fromBlock: blockNumber - 100,
       toBlock: blockNumber,
     }).then(function(evtData){
       let index;

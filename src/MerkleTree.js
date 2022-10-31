@@ -88,7 +88,7 @@ class MerkleTree {
 
   getRoot(list) {
     let tempList = list;
-    if (list.length == 1){
+    if (list.length == 1 || list.length == 0){
       return list[0];
     }
     let Web3 = this.web3;

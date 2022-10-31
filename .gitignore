@@ -9,3 +9,4 @@ package-lock.json
 # Config values
 .secret.json
 .env
+env
