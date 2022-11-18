@@ -56,7 +56,7 @@ class Snapshot {
     console.log("getting balances")
 
   // set provider for all later instances to use
-  await this.contract2.setProvider('wss://mainnet.infura.io/ws/v3/aa6ad0b0b40c4aaea4161b351747b59b');
+  await this.contract2.setProvider('wss://mainnet.infura.io/ws/v3/key');
 
     for (key in accountMap){
       let bal = await this.contract2.methods.balanceOf(key).call({}, blockNumber);
