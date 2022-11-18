@@ -1,4 +1,5 @@
 const Web3 = require('web3')
+const Web3_2 = require('web3')
 const ERC20 = require('../artifacts/contracts/helpers/ERC20.sol/ERC20.json')
 const ERC20Snapshot = require('../artifacts/contracts/CCBalances.sol/CCBalances.json')
 
@@ -14,6 +15,8 @@ class Snapshot {
     this.target = address; // contract address
     this.blockNumber = blockNumber; // block number contract was deployed.
     this.web3 = web3;
+    this.web2 = web3;
+    this.contract2 = new this.web2.eth.Contract(ERC20.abi, this.target);
     this.contract = new this.web3.eth.Contract(ERC20.abi, this.target);
     this.MerkleTree = new MerkleTree(web3);
     this.data = {};
@@ -23,29 +26,46 @@ class Snapshot {
     this.snapshot = new this.web3.eth.Contract(ERC20Snapshot.abi, target);
   }
 
-  async getAccountList(blockNumber) {
+  async getAccountList(blockNumber){
     let accountMap = {};
-    //console.log(this.blockNumber.number)
-
-    await this.contract.getPastEvents("Transfer", {
-      fromBlock: this.blockNumber.number,
-      toBlock: blockNumber,
-    }).then(function(evtData){
-      let index;
-      for (index in evtData) {
-        let evt = evtData[index];
-        accountMap[evt.returnValues.from] = true;
-        accountMap[evt.returnValues.to] = true;
+    let balanceMap = {}
+    let y = 0;
+    let _shift = 25000
+    let _toBlock;
+    let acc
+    while(y < blockNumber){
+      _toBlock = y + _shift
+      if(_toBlock > blockNumber){
+        _toBlock = blockNumber
       }
-    });
-
-    let list = [];
-    let key;
-
-    for (key in accountMap) {
-      list.push(key);
+      await this.contract.getPastEvents("Transfer", {
+        fromBlock:y,
+        toBlock: _toBlock,
+      }).then(function(evtData){
+        let index;
+        for (index in evtData) {
+          let evt = evtData[index];
+          accountMap[evt.returnValues.to] = true;
+        }
+      });
+      y += _shift
+      console.log(y)
     }
-    return list;
+    let key;
+    let accountList = [];
+    console.log("getting balances")
+
+  // set provider for all later instances to use
+  await this.contract2.setProvider('wss://mainnet.infura.io/ws/v3/aa6ad0b0b40c4aaea4161b351747b59b');
+
+    for (key in accountMap){
+      let bal = await this.contract2.methods.balanceOf(key).call({}, blockNumber);
+      if(bal > 0){
+        balanceMap[key] = bal;
+        accountList.push(key);
+      }
+    }     
+    return {accountList, balanceMap};
   }
 
   // returns a list account -> uint with balances of this account at a certain block 
@@ -58,7 +78,9 @@ class Snapshot {
     for (index in accountList) {
       let acc = accountList[index];
       let bal = await this.contract.methods.balanceOf(acc).call({}, blockNumber);
-      map[acc] = bal;
+      if(bal > 0){
+        map[acc] = bal;
+      }
     }
     return map;
   }
@@ -75,7 +97,6 @@ class Snapshot {
   }
 
   getHashList(sortedAccountList, balanceMap) {
-
     let hashList = [];
     let key;
     for (key in sortedAccountList){
@@ -89,24 +110,26 @@ class Snapshot {
 
   async getRootHash(blockNumber) {
     await this.setupData(blockNumber)
-
     return this.data[blockNumber].merkleRoot;
-
   }
 
   async setupData(blockNumber) {
     if (this.data[blockNumber]){
       return;
     }
-    let accountList = await this.getAccountList(blockNumber);
-    let sorted =  this.getSortedAccounts(accountList);
-    let balanceMap = await this.getBalances(sorted, blockNumber);
-    let hashList = this.getHashList(sorted, balanceMap);
+    let accounts = await this.getAccountList(blockNumber);
+    console.log("sorting Accounts")
+    let sorted =  this.getSortedAccounts(accounts.accountList);
+    //console.log("getting Balances")
+    //let balanceMap = await this.getBalances(sorted, blockNumber);
+    console.log("getting hashList")
+    let hashList = this.getHashList(sorted, accounts.balanceMap);
+    console.log("getting Root")
     let root = this.MerkleTree.getRoot(hashList);
     this.data[blockNumber] = {
       //accountList: accountList,
       sortedAccountList: sorted, 
-      balanceMap: balanceMap, 
+      balanceMap: accounts.balanceMap, 
       hashList: hashList,
       merkleRoot: root
     }
@@ -123,14 +146,10 @@ class Snapshot {
         break;
       }
     }
-
     let hashList = this.data[blockNumber].hashList;
-
     let proof = (this.MerkleTree.createProof(hashList, hashList[index]))
     return proof;
-
   }
-
 }
 
 module.exports = Snapshot;
