@@ -9,15 +9,16 @@ function sleep(ms) {
   return new Promise(resolve => setTimeout(resolve, ms));
 }
 
-class Snapshot {
+class Snapshot2 {
 
-  constructor(address, blockNumber, web3){
+  constructor(address, blockNumber, web3, node2){
     this.target = address; // contract address
     this.blockNumber = blockNumber; // block number contract was deployed.
     this.web3 = web3;
     this.web2 = web3;
     this.contract2 = new this.web2.eth.Contract(ERC20.abi, this.target);
     this.contract = new this.web3.eth.Contract(ERC20.abi, this.target);
+    this.node2 = node2;
     this.MerkleTree = new MerkleTree(web3);
     this.data = {};
   }
@@ -49,35 +50,21 @@ class Snapshot {
         }
       });
       y += _shift
+      console.log("Getting up to block: ",y)
     }
     let key;
     let accountList = [];
-
+    console.log("getting balances..")
+      // set provider for all later instances to use
+      await this.contract2.setProvider(this.node2);
     for (key in accountMap){
-      let bal = await this.contract.methods.balanceOf(key).call({}, blockNumber);
+      let bal = await this.contract2.methods.balanceOf(key).call({}, blockNumber);
       if(bal > 0){
         balanceMap[key] = bal;
         accountList.push(key);
       }
     }     
     return {accountList, balanceMap};
-  }
-
-  // returns a list account -> uint with balances of this account at a certain block 
-  // this *could* also be retrieved from getAccountList by tracking all transfers 
-  // but this assumes that initial balances (like minting) are also emitted as event
-  // this is added for completeness.
-  async getBalances(accountList, blockNumber){
-    let index;
-    let map = {};
-    for (index in accountList) {
-      let acc = accountList[index];
-      let bal = await this.contract.methods.balanceOf(acc).call({}, blockNumber);
-      if(bal > 0){
-        map[acc] = bal;
-      }
-    }
-    return map;
   }
 
   getSortedAccounts(accountList) {
@@ -142,4 +129,4 @@ class Snapshot {
   }
 }
 
-module.exports = Snapshot;
+module.exports = Snapshot2;
