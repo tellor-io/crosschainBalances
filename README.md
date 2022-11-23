@@ -1,55 +1,76 @@
 # Cross chain balances
 
-This repo allows the verification of the balance of any users' ERC20 token across chains. 
+This repo allows the creation and verification of the balance of any users' ERC20 token across chains with an example 
 
 
-## How does it work
+## Setting up and testing
 
-Step 1: Setup a queryId on Tellor with the chain id and the token address you want to read values from. Tellor reporters will use this to report the root hash to the other chain. Tellor reporters can use the following to create the root hash and report it on a different chain. 
-
-```javascript
-    const initBlock = await hre.ethers.provider.getBlock("latest")
-    Snap = new Snapshot(tellorOracle.address, initBlock, web3)
-    let blockN = await ethers.provider.getBlockNumber()
-    let root = await Snap.getRootHash(blockN)
-    //Take snapshop
-    let blockN = await ethers.provider.getBlockNumber()
-    let root = await Snap.getRootHash(blockN)
-    //create Tellor's queryData
-    const abiCoder = new ethers.utils.AbiCoder
-    const queryData = abiCoder.encode(['string', 'bytes'], ['CrossChainBalance', abiCoder.encode(['uint256', 'address'], [1,tellorOracle.address])])
-    const queryId = ethers.utils.keccak256(queryData)
-    // submit value: it takes 4 args : queryId, value, nonce and queryData
-    await tellorOracle.submitValue(queryId,root,0,queryData)
+Install Dependencies
+```
+npm i
+```
+Compile Smart Contracts
+```
+npx hardhat compile
 ```
 
-Step 2: Make sure your contract inherits CCBalances.sol 
+Test Locally
+```
+npx hardhat test
+```
 
-Step 3: Create the inputs to verify balances using this:
+## Integrating the verification
 
-```javascript
-    let Snap = new Snapshot(tellorOracle.address, initBlock, web3)
-    Snap.setSnapshotContract(claimYourPrize.address)
-    let data = Snap.data[blockN]
-    let sdata = data.sortedAccountList
-    for (key in data.sortedAccountList) {
-      let account = data.sortedAccountList[key]
-      let tx = await Snap.getClaimTX(blockN, account)
-      let balance = web3.utils.fromWei(data.balanceMap[account])
-      console.log(balance)
-      console.log(tx.hashes)
-      console.log(tx.hashRight)
+After adding a method of placing a root on-chain (e.g. via the tellor oracle), you'll need the following funciton to verify: 
+
+ ```
+   function verifyBalance(uint256 _chain, address _token, address _account, uint256 _balance, bytes32[] calldata _hashes, bool[] calldata _right) public view returns(bool) {
+        bytes32 _rootHash = rootHash[_chain][_token];
+        bytes32 _myHash = keccak256(abi.encode(_account,_balance));
+        if (_hashes.length == 1) {
+            require(_hashes[0] == _myHash);
+
+        } else {
+            require(_hashes[0] == _myHash || _hashes[1] == _myHash);
+
+        }
+        bool _found =  InTree(_rootHash, _hashes, _right);
+        return _found;
     }
 ```
 
-Step 4: Use the verifyBalance function in your contract to verfy balances and do something cool after verification.
 
-Step 5: Happy building!
+
+## Creating a root hash
+
+Edit your getRootHash.js file to include the correct address and blocknumber
+
+Edit the hardhat.config file to add your network/chain
+
+```
+npx hardhat run scripts/getRootHash.js --network mainnet
+```
+
+
+
+## Maintainers <a name="maintainers"> </a>
+This repository is maintained by the [Tellor team](https://github.com/orgs/tellor-io/people)
+
+
+## How to Contribute<a name="how2contribute"> </a>  
+
+Check out our issues log here on Github or feel free to reach out anytime [info@tellor.io](mailto:info@tellor.io)
+
+## Copyright
+
+Tellor Inc. 2022
+
+
 
 ## Use cases
 - Allow an airdrop based on the users' balances on a different chain
 - Allow a weighted voting based on the users' balances on a different chain
-- Allow a suser to claim rewards on a different chain
+- Allow a user to claim rewards on a different chain
 
 
 
