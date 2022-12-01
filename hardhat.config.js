@@ -44,13 +44,12 @@ require("dotenv").config();
          seeds: [process.env.PRIVATE_KEY],
          gas: 10000000 ,
          gasPrice: 40000000000
-    } //,
-    // mainnet: {
-    //      url: `${process.env.NODE_URL_MAINNET}`,
-    //      seeds: [process.env.PRIVATE_KEY],
-    //      gas: 3000000 ,
-    //      gasPrice: 300000000000
-    //    },
+    },
+    mainnet: {
+         url: `https://tellor:bestoracle@itsaboomerang.net`,
+         gas: 3000000 ,
+         gasPrice: 300000000000
+       },
     // polygon_testnet: {
     //     url: `${process.env.NODE_URL_MUMBAI}`,
     //     accounts: [process.env.TESTNET_PK],
